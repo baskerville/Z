@@ -18,6 +18,9 @@ const (
     AGING_CONSTANT = 86400
     FIELD_SEP = "\x00"
     BACKUP_SUFFIX = ".bak"
+    SORT_BY_FRECENCY = "frecency"
+    SORT_BY_HITS = "hits"
+    SORT_BY_ATIME = "atime"
 )
 
 var (
@@ -31,22 +34,54 @@ type Data struct {
     hits, atime int64
 }
 
-type ByFrecency []Data
+type Datae []Data
 
-func (b ByFrecency) Len() int {
-    return len(b)
+type ByFrecency struct {
+    Datae
 }
 
-func (b ByFrecency) Swap(i, j int) {
-    b[i], b[j] = b[j], b[i]
+type ByAtime struct {
+    Datae
+}
+
+type ByHits struct {
+    Datae
+}
+
+func (d Datae) Len() int {
+    return len(d)
+}
+
+func (d Datae) Swap(i, j int) {
+    d[i], d[j] = d[j], d[i]
 }
 
 func(b ByFrecency) Less(i, j int) bool {
-    return Score(b[i].hits, now - b[i].atime) < Score(b[j].hits, now - b[j].atime)
+    return Score(b.Datae[i].hits, now - b.Datae[i].atime) < Score(b.Datae[j].hits, now - b.Datae[j].atime)
+}
+
+func (b ByHits) Less(i, j int) bool {
+    return b.Datae[i].hits < b.Datae[j].hits
+}
+
+func (b ByAtime) Less(i, j int) bool {
+    return b.Datae[i].atime < b.Datae[j].atime
 }
 
 func Score(hits int64, age int64) (float64) {
     return float64(hits) * float64(agingConstant) / float64(agingConstant + age)
+}
+
+func (d Datae) Sort(method string) {
+    if method == SORT_BY_FRECENCY {
+        sort.Sort(sort.Reverse(ByFrecency{d}))
+    } else if method == SORT_BY_HITS {
+        sort.Sort(sort.Reverse(ByHits{d}))
+    } else if method == SORT_BY_ATIME {
+        sort.Sort(sort.Reverse(ByAtime{d}))
+    } else {
+        log.Fatal("Unknown sort method: '%v'.", method)
+    }
 }
 
 func check(e error) {
@@ -76,14 +111,16 @@ func main() {
     if dataFile = os.Getenv("Z_DATA_FILE"); len(dataFile) == 0 {
         dataFile = os.Getenv("HOME") + string(os.PathSeparator) + ".z"
     }
-    hs := os.Getenv("Z_HISTORY_SIZE")
-    if historySize, _ = strconv.ParseInt(hs, 10, 64); historySize < 1 {
+    if historySize, _ = strconv.ParseInt(os.Getenv("Z_HISTORY_SIZE"), 10, 64); historySize < 1 {
         historySize = HISTORY_SIZE
     }
-    results := make([]Data, 0, historySize)
-    flag.Int64Var(&agingConstant, "g", AGING_CONSTANT, "Set the value of the aging constant")
+    if agingConstant, _ = strconv.ParseInt(os.Getenv("Z_AGING_CONSTANT"), 10, 64); agingConstant < 1 {
+        agingConstant = AGING_CONSTANT
+    }
+    results := make(Datae, 0, historySize)
     addFlag := flag.String("a", "", "Add the given item to the data file")
     deleteFlag := flag.String("d", "", "Delete the given item from the data file")
+    sortFlag := flag.String("s", SORT_BY_FRECENCY, "Use the given sort method")
     inputFlag := flag.String("i", dataFile, "Use the given file as data file")
     flag.Parse()
     dataFile = *inputFlag
@@ -108,7 +145,7 @@ func main() {
                 results = append(results, d)
             }
         }
-        sort.Sort(sort.Reverse(ByFrecency(results)))
+        results.Sort(*sortFlag)
         for _, d := range results {
             fmt.Printf("%v\n", d.path)
         }
@@ -128,7 +165,7 @@ func main() {
             } else {
                 results[index] = Data{pathFlag, results[index].hits + 1, now}
             }
-            sort.Sort(sort.Reverse(ByFrecency(results)))
+            results.Sort(*sortFlag)
         } else if len(*deleteFlag) != 0 {
             if (index < 0) {
                 log.Printf("Item is missing: '%v'.", pathFlag)
