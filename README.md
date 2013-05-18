@@ -15,6 +15,24 @@ This is a small variation around [rupa](https://github.com/rupa)'s [z](https://g
 
 # Environment Variables
 
-- `Z_DATA_FILE`: path to the data file.
+- `Z_DATA_FILE`: path to the data file (defaults to `~/.z`).
 - `Z_HISTORY_SIZE`: maximum number of items.
 - `Z_AGING_CONSTANT`: value of the aging constant.
+
+# Help
+
+Ensure that the data file exists before running `Z`.
+
+You can emulate rupa's *z* with:
+
+```
+z() {
+    pushd "$(Z "$@" | head -n 1)" > /dev/null
+}
+```
+
+And by adding the following to your shell's *PROMPT_COMMAND*:
+
+```
+[ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
+```
