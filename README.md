@@ -36,3 +36,11 @@ And by adding the following to your shell's *PROMPT_COMMAND*:
 ```
 [ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
 ```
+
+# Frecency
+
+The *frecency* is given by:
+```
+h * A / (A + t)
+```
+Where `h` is the number of hits, `t` the access time and `A` the aging constant.
