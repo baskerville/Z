@@ -4,7 +4,7 @@ This is a small variation around [rupa](https://github.com/rupa)'s [z](https://g
 
 # Synopsis
 
-    z [OPTIONS] [PATTERN ...]
+    Z [OPTIONS] [PATTERN ...]
 
 # Options
 
