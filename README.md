@@ -23,13 +23,13 @@ This is a small variation around [rupa](https://github.com/rupa)'s [z](https://g
 
 Ensure that the data file exists before running `Z`.
 
-If you are a *z* user, you can generate a data file with:
+If you are a `z` user, you can generate a data file with:
 
 ```
 awk -F '|' 'BEGIN {OFS="\0"} {print $3, int($2), $1}' ~/.z
 ```
 
-You can emulate rupa's *z* with:
+You can emulate `z` with:
 
 ```
 z() {
@@ -37,7 +37,7 @@ z() {
 }
 ```
 
-And by adding the following to your shell's *PROMPT_COMMAND*:
+And by adding the following to your shell's `PROMPT_COMMAND`:
 
 ```
 [ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
