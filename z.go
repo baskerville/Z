@@ -80,7 +80,7 @@ func (d Datae) Sort(method string) {
     } else if method == SORT_BY_ATIME {
         sort.Sort(sort.Reverse(ByAtime{d}))
     } else {
-        log.Fatal("Unknown sort method: '%v'.", method)
+        log.Fatalf("Unknown sort method: '%v'.", method)
     }
 }
 
