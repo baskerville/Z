@@ -11,13 +11,14 @@ import (
     "regexp"
     "strings"
     "strconv"
+    "io/ioutil"
+    "path/filepath"
 )
 
 const (
     HISTORY_SIZE = 600
     AGING_CONSTANT = 86400
     FIELD_SEP = "\x00"
-    BACKUP_SUFFIX = ".bak"
     SORT_BY_FRECENCY = "frecency"
     SORT_BY_HITS = "hits"
     SORT_BY_ATIME = "atime"
@@ -173,8 +174,7 @@ func main() {
                 results = append(results[:index], results[index + 1:]...)
             }
         }
-        dataFileBackup := dataFile + BACKUP_SUFFIX
-        fobj, err := os.Create(dataFileBackup)
+        fobj, err := ioutil.TempFile(filepath.Dir(dataFile), filepath.Base(dataFile))
         check(err)
         defer fobj.Close()
         bf := bufio.NewWriter(fobj)
@@ -189,7 +189,7 @@ func main() {
         }
         err = bf.Flush()
         check(err)
-        err = os.Rename(dataFileBackup, dataFile)
+        err = os.Rename(fobj.Name(), dataFile)
         check(err)
     }
 }
