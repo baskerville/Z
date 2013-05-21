@@ -1,6 +1,6 @@
 # Description
 
-This is a small variation around [rupa](https://github.com/rupa)'s [z](https://github.com/rupa/z) and my first incursion into [Go](http://golang.org/).
+This is a small variation around rupa's [z](https://github.com/rupa/z) and my first incursion into [Go](http://golang.org/).
 
 # Synopsis
 
