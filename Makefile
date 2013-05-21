@@ -3,8 +3,8 @@ BINPREFIX = $(PREFIX)/bin
 
 all: Z
 
-Z: z.go
-	go build -o Z z.go
+Z: Z.go
+	go build Z.go
 
 install:
 	mkdir -p "$(DESTDIR)$(BINPREFIX)"
