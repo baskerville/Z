@@ -1,37 +1,37 @@
 package main
 
 import (
-    "os"
-    "log"
-    "fmt"
-    "flag"
-    "time"
-    "sort"
     "bufio"
-    "regexp"
-    "strings"
-    "strconv"
+    "flag"
+    "fmt"
     "io/ioutil"
+    "log"
+    "os"
     "path/filepath"
+    "regexp"
+    "sort"
+    "strconv"
+    "strings"
+    "time"
 )
 
 const (
-    HISTORY_SIZE = 600
-    AGING_CONSTANT = 86400
-    FIELD_SEP = "\x00"
+    HISTORY_SIZE     = 600
+    AGING_CONSTANT   = 86400
+    FIELD_SEP        = "\x00"
     SORT_BY_FRECENCY = "frecency"
-    SORT_BY_HITS = "hits"
-    SORT_BY_ATIME = "atime"
+    SORT_BY_HITS     = "hits"
+    SORT_BY_ATIME    = "atime"
 )
 
 var (
-    now = time.Now().Unix()
-    historySize int64
+    now           = time.Now().Unix()
+    historySize   int64
     agingConstant int64
 )
 
 type Data struct {
-    path string
+    path        string
     hits, atime int64
 }
 
@@ -57,8 +57,8 @@ func (d Datae) Swap(i, j int) {
     d[i], d[j] = d[j], d[i]
 }
 
-func(b ByFrecency) Less(i, j int) bool {
-    return Score(b.Datae[i].hits, now - b.Datae[i].atime) < Score(b.Datae[j].hits, now - b.Datae[j].atime)
+func (b ByFrecency) Less(i, j int) bool {
+    return Score(b.Datae[i].hits, now-b.Datae[i].atime) < Score(b.Datae[j].hits, now-b.Datae[j].atime)
 }
 
 func (b ByHits) Less(i, j int) bool {
@@ -69,8 +69,8 @@ func (b ByAtime) Less(i, j int) bool {
     return b.Datae[i].atime < b.Datae[j].atime
 }
 
-func Score(hits int64, age int64) (float64) {
-    return float64(hits) * float64(agingConstant) / float64(agingConstant + age)
+func Score(hits int64, age int64) float64 {
+    return float64(hits) * float64(agingConstant) / float64(agingConstant+age)
 }
 
 func (d Datae) Sort(method string) {
@@ -86,17 +86,17 @@ func (d Datae) Sort(method string) {
 }
 
 func check(e error) {
-    if (e != nil) {
+    if e != nil {
         panic(e)
     }
 }
 
 func ReadData(r *bufio.Reader) (Data, error) {
     line, err := r.ReadString('\n')
-    if (err != nil) {
+    if err != nil {
         return Data{}, err
     }
-    line = line[:len(line) - 1]
+    line = line[:len(line)-1]
     tok := strings.Split(line, FIELD_SEP)
     atime, err := strconv.ParseInt(tok[0], 10, 64)
     check(err)
@@ -154,24 +154,24 @@ func main() {
         var index int64 = -1
         var cur int64
         for d, err := ReadData(bf); err == nil; d, err = ReadData(bf) {
-            if (index < 0 && pathFlag == d.path) {
+            if index < 0 && pathFlag == d.path {
                 index = cur
             }
             results = append(results, d)
             cur++
         }
         if len(*addFlag) != 0 {
-            if (index < 0) {
+            if index < 0 {
                 results = append(results, Data{pathFlag, 1, now})
             } else {
                 results[index] = Data{pathFlag, results[index].hits + 1, now}
             }
             results.Sort(*sortFlag)
         } else if len(*deleteFlag) != 0 {
-            if (index < 0) {
+            if index < 0 {
                 log.Printf("Item is missing: '%v'.", pathFlag)
             } else {
-                results = append(results[:index], results[index + 1:]...)
+                results = append(results[:index], results[index+1:]...)
             }
         }
         fobj, err := ioutil.TempFile(filepath.Dir(dataFile), filepath.Base(dataFile))
