@@ -23,14 +23,18 @@ This is a small variation around rupa's [z](https://github.com/rupa/z) and my fi
 
 Ensure that the data file exists before running `Z`.
 
-If you are a `z` user, you can generate a data file with:
-
+Either create an empty one:
 ```
-awk -F '|' 'BEGIN {OFS="\0"} {print $3, int($2), $1}' ~/.z
+touch ~/.z
+```
+
+Or, if you are a `z` user, import your data file with:
+```
+mv ~/.z ~/.z.bak
+awk -F '|' 'BEGIN {OFS="\0"} {print $3, int($2), $1}' ~/.z.bak > ~/.z
 ```
 
 You can emulate `z` with:
-
 ```
 z() {
     local dir=$(Z "$@" | head -n 1)
@@ -38,10 +42,16 @@ z() {
 }
 ```
 
-And by adding the following to your shell's `PROMPT_COMMAND`:
-
+If your shell is `Bash`, add the following to `~/.bashrc`:
 ```
-[ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
+export PROMPT_COMMAND='[ "$PWD" -ef "$HOME" ] || Z -a "$PWD"'
+```
+
+Else, if your shell is `Zsh`, add the following to `~/.zshrc`:
+```
+chpwd() {
+    [ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
+}
 ```
 
 # Frecency
