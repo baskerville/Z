@@ -139,7 +139,11 @@ func main() {
         if sPattern = strings.Join(flag.Args(), ".*"); len(sPattern) == 0 {
             sPattern = ".*"
         }
-        pattern, err := regexp.Compile("(?i)" + sPattern)
+        reFlags := "(?i)"
+        if sPattern != strings.ToLower(sPattern) {
+            reFlags = ""
+        }
+        pattern, err := regexp.Compile(reFlags + sPattern)
         check(err)
         for d, err := ReadData(bf); err == nil; d, err = ReadData(bf) {
             if pattern.MatchString(d.path) {
