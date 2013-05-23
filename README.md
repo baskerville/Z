@@ -33,7 +33,8 @@ You can emulate `z` with:
 
 ```
 z() {
-    pushd "$(Z "$@" | head -n 1)" > /dev/null
+    local dir=$(Z "$@" | head -n 1)
+    pushd "$dir" > /dev/null 2>&1 || Z -d "$dir"
 }
 ```
 
