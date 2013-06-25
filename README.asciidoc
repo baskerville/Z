@@ -21,7 +21,7 @@ Options
 `-i` _PATH_::
   Use the given file as data file.
 `-s` _frecency_|_hits_|_atime_::
-  Use the given sort method.
+  Use the given sort method (defaults to _frecency_).
 
 [[environment-variables]]
 Environment Variables

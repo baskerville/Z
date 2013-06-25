@@ -19,7 +19,7 @@ This is a small variation around rupa's [z](https://github.com/rupa/z).
 `-i` *PATH*
 :    Use the given file as data file.
 `-s` *frecency*|*hits*|*atime*
-:    Use the given sort method.
+:    Use the given sort method (defaults to *frecency*).
 
 # Environment Variables
 
