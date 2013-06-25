@@ -1,0 +1,110 @@
+.TH "Z" 1 "June 25, 2013" "Z"
+.SH NAME
+Z - Wu wei terminal directory jumping
+.SH SYNOPSIS
+.PP
+\f[B]Z\f[] [\f[I]OPTIONS\f[]] [\f[I]PATTERN\f[] ...]
+.SH DESCRIPTION
+.PP
+This is a small variation around rupa\[aq]s z.
+.SH OPTIONS
+.TP
+.B \f[C]\-a\f[] \f[I]ITEM\f[]
+Add the given item to the data file.
+.RS
+.RE
+.TP
+.B \f[C]\-d\f[] \f[I]ITEM\f[]
+Delete the given item from the data file.
+.RS
+.RE
+.TP
+.B \f[C]\-i\f[] \f[I]PATH\f[]
+Use the given file as data file.
+.RS
+.RE
+.TP
+.B \f[C]\-s\f[] \f[I]frecency\f[]|\f[I]hits\f[]|\f[I]atime\f[]
+Use the given sort method.
+.RS
+.RE
+.SH ENVIRONMENT VARIABLES
+.TP
+.B \f[I]Z_DATA_FILE\f[]
+path to the data file (defaults to \f[I]~/.z\f[]).
+.RS
+.RE
+.TP
+.B \f[I]Z_HISTORY_SIZE\f[]
+maximum number of items.
+.RS
+.RE
+.TP
+.B \f[I]Z_AGING_CONSTANT\f[]
+value of the aging constant.
+.RS
+.RE
+.SH HELP
+.PP
+Ensure that the data file exists before running \f[B]Z\f[].
+.PP
+Either create an empty one:
+.IP
+.nf
+\f[C]
+touch\ ~/.z
+\f[]
+.fi
+.PP
+Or, if you are a \f[B]z\f[] user, import your data file with:
+.IP
+.nf
+\f[C]
+mv\ ~/.z\ ~/.z.bak
+awk\ \-F\ \[aq]|\[aq]\ \[aq]BEGIN\ {OFS="\\0"}\ {print\ $3,\ int($2),\ $1}\[aq]\ ~/.z.bak\ >\ ~/.z
+\f[]
+.fi
+.PP
+You can emulate \f[B]z\f[] with:
+.IP
+.nf
+\f[C]
+z()\ {
+\ \ \ \ local\ dir=$(Z\ "$\@"\ |\ head\ \-n\ 1)
+\ \ \ \ pushd\ "$dir"\ >\ /dev/null\ 2>&1\ ||\ Z\ \-d\ "$dir"
+}
+\f[]
+.fi
+.PP
+If your shell is \f[B]Bash\f[], add the following to \f[I]~/.bashrc\f[]:
+.IP
+.nf
+\f[C]
+export\ PROMPT_COMMAND=\[aq][\ "$PWD"\ \-ef\ "$HOME"\ ]\ ||\ Z\ \-a\ "$PWD"\[aq]
+\f[]
+.fi
+.PP
+Else, if your shell is \f[B]Zsh\f[], add the following to \f[I]~/.zshrc\f[]:
+.IP
+.nf
+\f[C]
+chpwd()\ {
+\ \ \ \ [\ "$PWD"\ \-ef\ "$HOME"\ ]\ ||\ Z\ \-a\ "$PWD"
+}
+\f[]
+.fi
+.SH FRECENCY
+.PP
+The \f[I]frecency\f[] is given by:
+.IP
+.nf
+\f[C]
+h\ *\ A\ /\ (A\ +\ t)
+\f[]
+.fi
+.PP
+Where \f[I]h\f[] is the number of hits, \f[I]t\f[] the access time and \f[I]A\f[] the aging constant.
+.SH AUTHOR
+Bastien Dejean <baskerville at lavabit.com>
+.SH HOMEPAGE
+https://github.com/baskerville/Z

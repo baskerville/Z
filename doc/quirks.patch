@@ -1,0 +1,24 @@
+diff -ru a/README.asciidoc b/README.asciidoc
+--- a/README.asciidoc	2013-06-25 15:12:05.969535211 +0200
++++ b/README.asciidoc	2013-06-25 15:12:20.212812995 +0200
+@@ -2,7 +2,7 @@
+ Synopsis
+ --------
+ 
+-*Z* [_OPTIONS_][*PATTERN* ...]
++*Z* [_OPTIONS_] [_PATTERN_ ...]
+ 
+ [[description]]
+ Description
+diff -ru a/Z.1 b/Z.1
+--- a/Z.1	2013-06-25 15:12:05.969535211 +0200
++++ b/Z.1	2013-06-25 15:14:19.832346477 +0200
+@@ -3,7 +3,7 @@
+ Z - Wu wei terminal directory jumping
+ .SH SYNOPSIS
+ .PP
+-\f[B]Z\f[] [\f[I]OPTIONS\f[]][*PATTERN* ...]
++\f[B]Z\f[] [\f[I]OPTIONS\f[]] [\f[I]PATTERN\f[] ...]
+ .SH DESCRIPTION
+ .PP
+ This is a small variation around rupa\[aq]s z.

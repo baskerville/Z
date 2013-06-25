@@ -1,0 +1,89 @@
+[[synopsis]]
+Synopsis
+--------
+
+*Z* [_OPTIONS_] [_PATTERN_ ...]
+
+[[description]]
+Description
+-----------
+
+This is a small variation around rupa's https://github.com/rupa/z[z].
+
+[[options]]
+Options
+-------
+
+`-a` _ITEM_::
+  Add the given item to the data file.
+`-d` _ITEM_::
+  Delete the given item from the data file.
+`-i` _PATH_::
+  Use the given file as data file.
+`-s` _frecency_|_hits_|_atime_::
+  Use the given sort method.
+
+[[environment-variables]]
+Environment Variables
+---------------------
+
+_Z_DATA_FILE_::
+  path to the data file (defaults to _~/.z_).
+_Z_HISTORY_SIZE_::
+  maximum number of items.
+_Z_AGING_CONSTANT_::
+  value of the aging constant.
+
+[[help]]
+Help
+----
+
+Ensure that the data file exists before running *Z*.
+
+Either create an empty one:
+
+----------
+touch ~/.z
+----------
+
+Or, if you are a *z* user, import your data file with:
+
+---------------------------------------------------------------------
+mv ~/.z ~/.z.bak
+awk -F '|' 'BEGIN {OFS="\0"} {print $3, int($2), $1}' ~/.z.bak > ~/.z
+---------------------------------------------------------------------
+
+You can emulate *z* with:
+
+------------------------------------------------
+z() {
+    local dir=$(Z "$@" | head -n 1)
+    pushd "$dir" > /dev/null 2>&1 || Z -d "$dir"
+}
+------------------------------------------------
+
+If your shell is *Bash*, add the following to _~/.bashrc_:
+
+-------------------------------------------------------------
+export PROMPT_COMMAND='[ "$PWD" -ef "$HOME" ] || Z -a "$PWD"'
+-------------------------------------------------------------
+
+Else, if your shell is *Zsh*, add the following to _~/.zshrc_:
+
+-----------------------------------------
+chpwd() {
+    [ "$PWD" -ef "$HOME" ] || Z -a "$PWD"
+}
+-----------------------------------------
+
+[[frecency]]
+Frecency
+--------
+
+The _frecency_ is given by:
+
+---------------
+h * A / (A + t)
+---------------
+
+Where _h_ is the number of hits, _t_ the access time and _A_ the aging constant.
