@@ -1,4 +1,5 @@
 NAME = Z
+VERSION = 0.1
 
 PREFIX ?= /usr/local
 BINPREFIX = $(PREFIX)/bin
@@ -13,15 +14,15 @@ install:
 	mkdir -p "$(DESTDIR)$(BINPREFIX)"
 	cp -p $(NAME) "$(DESTDIR)$(BINPREFIX)"
 	mkdir -p "$(DESTDIR)$(MANPREFIX)"/man1
-	cp -p $(NAME).1 "$(DESTDIR)$(MANPREFIX)"/man1
+	cp -p doc/$(NAME).1 "$(DESTDIR)$(MANPREFIX)"/man1
 
 uninstall:
 	rm -f "$(DESTDIR)$(BINPREFIX)"/$(NAME)
 	rm -f "$(DESTDIR)$(MANPREFIX)"/man1/$(NAME).1
+
 doc:
-	pandoc -t json doc/README.md | runhaskell doc/man_filter.hs | pandoc --no-wrap -f json -t man --template doc/man.template -V name=$(NAME) -o $(NAME).1
-	pandoc --no-wrap -f markdown -t asciidoc doc/README.md -o README.asciidoc
-	patch -p 1 -i doc/quirks.patch
+	a2x -v -d manpage -f manpage -a revnumber=$(VERSION) doc/$(NAME).1.txt
+
 clean:
 	rm -f $(NAME)
 

@@ -1,0 +1,163 @@
+'\" t
+.\"     Title: z
+.\"    Author: [see the "Author" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 06/27/2013
+.\"    Manual: Z Manual
+.\"    Source: Z 0.1
+.\"  Language: English
+.\"
+.TH "Z" "1" "06/27/2013" "Z 0\&.1" "Z Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+Z \- Wu wei terminal directory jumping
+.SH "SYNOPSIS"
+.sp
+\fBZ\fR [\fIOPTIONS\fR] [\fIPATTERN\fR \&...]
+.SH "DESCRIPTION"
+.sp
+This is a small variation around rupa\(cqs z\&.
+.SH "OPTIONS"
+.PP
+\fB\-a\fR \fIITEM\fR
+.RS 4
+Add the given item to the data file\&.
+.RE
+.PP
+\fB\-d\fR \fIITEM\fR
+.RS 4
+Delete the given item from the data file\&.
+.RE
+.PP
+\fB\-i\fR \fIPATH\fR
+.RS 4
+Use the given file as data file\&.
+.RE
+.PP
+\fB\-s\fR \fIfrecency\fR|\fIhits\fR|\fIatime\fR
+.RS 4
+Use the given sort method (defaults to
+\fIfrecency\fR)\&.
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.PP
+\fIZ_DATA_FILE\fR
+.RS 4
+Path to the data file (defaults to
+\fI~/\&.z\fR)\&.
+.RE
+.PP
+\fIZ_HISTORY_SIZE\fR
+.RS 4
+Maximum number of items\&.
+.RE
+.PP
+\fIZ_AGING_CONSTANT\fR
+.RS 4
+Value of the aging constant\&.
+.RE
+.SH "HELP"
+.sp
+Ensure that the data file exists before running \fBZ\fR\&.
+.sp
+Either create an empty one:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+touch ~/\&.z
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Or, if you are a \fBz\fR user, import your data file with:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+mv ~/\&.z ~/\&.z\&.bak
+awk \-F \*(Aq|\*(Aq \*(AqBEGIN {OFS="\e0"} {print $3, int($2), $1}\*(Aq ~/\&.z\&.bak > ~/\&.z
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You can emulate \fBz\fR with:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+z() {
+    local dir=$(Z "$@" | head \-n 1)
+    pushd "$dir" > /dev/null 2>&1 || Z \-d "$dir"
+}
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+If your shell is \fBBash\fR, add the following to \fI~/\&.bashrc\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+export PROMPT_COMMAND=\*(Aq[ "$PWD" \-ef "$HOME" ] || Z \-a "$PWD"\*(Aq
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Else, if your shell is \fBZsh\fR, add the following to \fI~/\&.zshrc\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+chpwd() {
+    [ "$PWD" \-ef "$HOME" ] || Z \-a "$PWD"
+}
+.fi
+.if n \{\
+.RE
+.\}
+.SH "FRECENCY"
+.sp
+The \fIfrecency\fR is given by:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+h * A / (A + t)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Where \fIh\fR is the number of hits, \fIt\fR the access time and \fIA\fR the aging constant\&.
+.SH "AUTHOR"
+.sp
+Bastien Dejean <baskerville at lavabit\&.com>
