@@ -102,7 +102,7 @@ Where _h_ is the number of hits, _t_ the access time and _A_ the aging constant.
 Author
 ------
 
-Bastien Dejean <baskerville at lavabit.com>
+Bastien Dejean <nihilhill at gmail.com>
 
 ////
 vim: set ft=asciidoc:
