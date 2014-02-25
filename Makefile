@@ -1,5 +1,5 @@
 NAME = Z
-VERSION = 0.5
+VERSION = 0.5.1
 
 PREFIX ?= /usr/local
 BINPREFIX = $(PREFIX)/bin
