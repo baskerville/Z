@@ -8,7 +8,7 @@ Z(1)
 Name
 ----
 
-Z - Wu wei terminal directory jumping
+Z - Fast terminal directory jumping
 
 Synopsis
 --------
