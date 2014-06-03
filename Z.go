@@ -16,12 +16,12 @@ import (
 )
 
 const (
-	HISTORY_SIZE     = 600
-	AGING_CONSTANT   = 86400
-	FIELD_SEP        = "\x00"
-	SORT_BY_FRECENCY = "frecency"
-	SORT_BY_HITS     = "hits"
-	SORT_BY_ATIME    = "atime"
+	defaultHistorySize   = 600
+	defaultAgingConstant = 86400
+	fieldSep             = "\x00"
+	sortByFrecency       = "frecency"
+	sortByHits           = "hits"
+	sortByAtime          = "atime"
 )
 
 var (
@@ -74,11 +74,11 @@ func Score(hits int64, age int64) float64 {
 }
 
 func (d Datae) Sort(method string) {
-	if method == SORT_BY_FRECENCY {
+	if method == sortByFrecency {
 		sort.Sort(sort.Reverse(ByFrecency{d}))
-	} else if method == SORT_BY_HITS {
+	} else if method == sortByHits {
 		sort.Sort(sort.Reverse(ByHits{d}))
-	} else if method == SORT_BY_ATIME {
+	} else if method == sortByAtime {
 		sort.Sort(sort.Reverse(ByAtime{d}))
 	} else {
 		log.Fatalf("Unknown sort method: '%v'.", method)
@@ -97,7 +97,7 @@ func ReadData(r *bufio.Reader) (Data, error) {
 		return Data{}, err
 	}
 	line = line[:len(line)-1]
-	tok := strings.Split(line, FIELD_SEP)
+	tok := strings.Split(line, fieldSep)
 	atime, err := strconv.ParseInt(tok[0], 10, 64)
 	check(err)
 	hits, err := strconv.ParseInt(tok[1], 10, 64)
@@ -113,15 +113,15 @@ func main() {
 		dataFile = os.Getenv("HOME") + string(os.PathSeparator) + ".z"
 	}
 	if historySize, _ = strconv.ParseInt(os.Getenv("Z_HISTORY_SIZE"), 10, 64); historySize < 1 {
-		historySize = HISTORY_SIZE
+		historySize = defaultHistorySize
 	}
 	if agingConstant, _ = strconv.ParseInt(os.Getenv("Z_AGING_CONSTANT"), 10, 64); agingConstant < 1 {
-		agingConstant = AGING_CONSTANT
+		agingConstant = defaultAgingConstant
 	}
 	results := make(Datae, 0, historySize)
 	addFlag := flag.String("a", "", "Add the given item to the data file")
 	deleteFlag := flag.String("d", "", "Delete the given item from the data file")
-	sortFlag := flag.String("s", SORT_BY_FRECENCY, "Use the given sort method")
+	sortFlag := flag.String("s", sortByFrecency, "Use the given sort method")
 	inputFlag := flag.String("i", dataFile, "Use the given file as data file")
 	flag.Parse()
 	dataFile = *inputFlag
@@ -187,7 +187,7 @@ func main() {
 			if cur >= historySize {
 				break
 			}
-			_, err := bf.WriteString(fmt.Sprintf("%v%v%v%v%v\n", d.atime, FIELD_SEP, d.hits, FIELD_SEP, d.path))
+			_, err := bf.WriteString(fmt.Sprintf("%v%v%v%v%v\n", d.atime, fieldSep, d.hits, fieldSep, d.path))
 			check(err)
 			cur++
 		}
