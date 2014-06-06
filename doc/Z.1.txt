@@ -35,6 +35,9 @@ Options
 *-s* _frecency_|_hits_|_atime_::
     Use the given sort method (defaults to _frecency_).
 
+*-b*::
+    Only match on the last path component.
+
 Environment Variables
 ---------------------
 

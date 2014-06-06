@@ -122,6 +122,7 @@ func main() {
 	addFlag := flag.String("a", "", "Add the given item to the data file")
 	deleteFlag := flag.String("d", "", "Delete the given item from the data file")
 	sortFlag := flag.String("s", sortByFrecency, "Use the given sort method")
+	matchBaseFlag := flag.Bool("b", false, "Only match on the last path component")
 	inputFlag := flag.String("i", dataFile, "Use the given file as data file")
 	flag.Parse()
 	dataFile = *inputFlag
@@ -146,7 +147,7 @@ func main() {
 		pattern, err := regexp.Compile(reFlags + sPattern)
 		check(err)
 		for d, err := ReadData(bf); err == nil; d, err = ReadData(bf) {
-			if pattern.MatchString(d.path) {
+			if pattern.MatchString(d.path) && (!*matchBaseFlag || pattern.MatchString(filepath.Base(d.path))) {
 				results = append(results, d)
 			}
 		}
