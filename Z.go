@@ -79,8 +79,8 @@ func main() {
 		historySize = defaultHistorySize
 	}
 	results := make(Datae, 0, historySize)
-	addFlag := flag.String("a", "add", "Add the given item to the data file")
-	deleteFlag := flag.String("d", "delete", "Delete the given item from the data file")
+	addFlag := flag.String("a", "", "Add the given item to the data file")
+	deleteFlag := flag.String("d", "", "Delete the given item from the data file")
 	inputFlag := flag.String("i", dataFile, "Use the given file as data file")
 	flag.Parse()
 	dataFile = *inputFlag
@@ -93,6 +93,7 @@ func main() {
 	check(err)
 	defer fobj.Close()
 	var bf = bufio.NewReader(fobj)
+	fmt.Printf("hello %v %v\n", len(pathFlag), pathFlag)
 	if len(pathFlag) == 0 {
 		var sPattern string
 		if sPattern = strings.Join(flag.Args(), ".*"); len(sPattern) == 0 {
