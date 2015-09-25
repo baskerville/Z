@@ -32,9 +32,6 @@ Options
 *-i* _PATH_::
     Use the given file as data file.
 
-*-s* _frecency_|_hits_|_atime_::
-    Use the given sort method (defaults to _frecency_).
-
 Environment Variables
 ---------------------
 
@@ -43,9 +40,6 @@ _Z_DATA_FILE_::
 
 _Z_HISTORY_SIZE_::
     Maximum number of items.
-
-_Z_AGING_CONSTANT_::
-    Value of the aging constant.
 
 Help
 ----
@@ -94,10 +88,10 @@ Frecency
 The _frecency_ is given by:
 
 ----
-h * A / (A + t)
+H / (0.25 + A * 3e-6)
 ----
 
-Where _h_ is the number of hits, _t_ the access time and _A_ the aging constant.
+Where _H_ is the number of hits and _A_ the age in seconds.
 
 Author
 ------

@@ -17,17 +17,12 @@ import (
 
 const (
 	defaultHistorySize   = 600
-	defaultAgingConstant = 86400
 	fieldSep             = "\x00"
-	sortByFrecency       = "frecency"
-	sortByHits           = "hits"
-	sortByAtime          = "atime"
 )
 
 var (
 	now           = time.Now().Unix()
 	historySize   int64
-	agingConstant int64
 )
 
 type Data struct {
@@ -37,18 +32,6 @@ type Data struct {
 
 type Datae []Data
 
-type ByFrecency struct {
-	Datae
-}
-
-type ByAtime struct {
-	Datae
-}
-
-type ByHits struct {
-	Datae
-}
-
 func (d Datae) Len() int {
 	return len(d)
 }
@@ -57,32 +40,12 @@ func (d Datae) Swap(i, j int) {
 	d[i], d[j] = d[j], d[i]
 }
 
-func (b ByFrecency) Less(i, j int) bool {
-	return Score(b.Datae[i].hits, now-b.Datae[i].atime) < Score(b.Datae[j].hits, now-b.Datae[j].atime)
-}
-
-func (b ByHits) Less(i, j int) bool {
-	return b.Datae[i].hits < b.Datae[j].hits
-}
-
-func (b ByAtime) Less(i, j int) bool {
-	return b.Datae[i].atime < b.Datae[j].atime
+func (d Datae) Less(i, j int) bool {
+	return Score(d[i].hits, now-d[i].atime) < Score(d[j].hits, now-d[j].atime)
 }
 
 func Score(hits int64, age int64) float64 {
-	return float64(hits) * float64(agingConstant) / float64(agingConstant+age)
-}
-
-func (d Datae) Sort(method string) {
-	if method == sortByFrecency {
-		sort.Sort(sort.Reverse(ByFrecency{d}))
-	} else if method == sortByHits {
-		sort.Sort(sort.Reverse(ByHits{d}))
-	} else if method == sortByAtime {
-		sort.Sort(sort.Reverse(ByAtime{d}))
-	} else {
-		log.Fatalf("Unknown sort method: '%v'.", method)
-	}
+	return float64(hits) / (0.25 + float64(age) * 3e-16)
 }
 
 func check(e error) {
@@ -115,13 +78,9 @@ func main() {
 	if historySize, _ = strconv.ParseInt(os.Getenv("Z_HISTORY_SIZE"), 10, 64); historySize < 1 {
 		historySize = defaultHistorySize
 	}
-	if agingConstant, _ = strconv.ParseInt(os.Getenv("Z_AGING_CONSTANT"), 10, 64); agingConstant < 1 {
-		agingConstant = defaultAgingConstant
-	}
 	results := make(Datae, 0, historySize)
-	addFlag := flag.String("a", "", "Add the given item to the data file")
-	deleteFlag := flag.String("d", "", "Delete the given item from the data file")
-	sortFlag := flag.String("s", sortByFrecency, "Use the given sort method")
+	addFlag := flag.String("a", "add", "Add the given item to the data file")
+	deleteFlag := flag.String("d", "delete", "Delete the given item from the data file")
 	inputFlag := flag.String("i", dataFile, "Use the given file as data file")
 	flag.Parse()
 	dataFile = *inputFlag
@@ -150,7 +109,7 @@ func main() {
 				results = append(results, d)
 			}
 		}
-		results.Sort(*sortFlag)
+		sort.Sort(sort.Reverse(Datae(results)))
 		for _, d := range results {
 			fmt.Printf("%v\n", d.path)
 		}
@@ -170,7 +129,10 @@ func main() {
 			} else {
 				results[index] = Data{pathFlag, results[index].hits + 1, now}
 			}
-			results.Sort(*sortFlag)
+			if int64(len(results)) > historySize {
+				sort.Sort(Datae(results))
+				results = results[1:]
+			}
 		} else if len(*deleteFlag) != 0 {
 			if index < 0 {
 				log.Printf("Item is missing: '%v'.", pathFlag)
@@ -182,14 +144,9 @@ func main() {
 		check(err)
 		defer fobj.Close()
 		bf := bufio.NewWriter(fobj)
-		cur = 0
 		for _, d := range results {
-			if cur >= historySize {
-				break
-			}
 			_, err := bf.WriteString(fmt.Sprintf("%v%v%v%v%v\n", d.atime, fieldSep, d.hits, fieldSep, d.path))
 			check(err)
-			cur++
 		}
 		err = bf.Flush()
 		check(err)
