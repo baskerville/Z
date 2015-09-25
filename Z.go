@@ -93,7 +93,6 @@ func main() {
 	check(err)
 	defer fobj.Close()
 	var bf = bufio.NewReader(fobj)
-	fmt.Printf("hello %v %v\n", len(pathFlag), pathFlag)
 	if len(pathFlag) == 0 {
 		var sPattern string
 		if sPattern = strings.Join(flag.Args(), ".*"); len(sPattern) == 0 {
